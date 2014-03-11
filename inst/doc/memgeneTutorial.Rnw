@@ -1,0 +1,257 @@
+% -*- mode: noweb; noweb-default-code-mode: R-mode; -*-
+%\VignetteIndexEntry{MEMGENE tutorial}
+\documentclass[11pt]{article}
+
+
+\SweaveOpts{echo=FALSE}
+\usepackage{a4wide}
+\usepackage{parskip}
+\usepackage{natbib}
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage{xcolor,soul,lipsum}
+\usepackage{lineno}
+\usepackage[auth-lg, affil-it]{authblk}
+\usepackage[bookmarks=false, colorlinks=true, citecolor=black, linkcolor=red, urlcolor=red]{hyperref}
+
+
+
+\title{The MEMGENE package for R:\\Tutorial}
+\author[1,2]{Paul Galpern}
+\author[3]{Pedro Peres-Neto}
+\affil[1]{Faculty of Environmental Design, University of Calgary}
+\affil[2]{Natural Resources Institute, University of Manitoba}
+\affil[3]{Departement des sciences biologiques, Universite du Quebec a Montreal}
+\date{}
+
+
+
+\bibliographystyle{Plainnat}
+\bibpunct{(}{)}{;}{a}{,}{,}
+
+
+
+\newcommand{\hr}[2]{\href{#1}{\setulcolor{red}\ul{#2}}}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+\newpage
+
+<<echo=FALSE,print=FALSE>>=
+library(memgene)
+options(width=65)
+@
+
+\section{Introduction}
+
+MEMGENE is a tool for spatial pattern detection in genetic distance data.  It uses a multivariate regression approach and Moran's Eigenvector Maps (MEM) to identify the spatial component of genetic variation.  MEMGENE variables are the output, and can be used in visualizations or in subsequent inference about ecological or movement processes that underly genetic pattern. \\
+
+Please see the publication associated with the MEMGENE package \citep{galpern_2014} for more information.\\
+
+Two tutorials are presented here.  The first shows a MEMGENE analysis of a simulated data set produced for the publication associated with the MEMGENE package \citep{galpern_2014} and a second demonstrates an analysis for field-collected caribou data  contained in the same paper.
+
+\section{Tutorial 1:  Simulated data set}
+
+This tutorial demonstrates how to use MEMGENE under typical analysis conditions.  It is  possible to reproduce these examples directly in R.  The tutorial focuses on the radial data set, which is also provided with the package.
+
+\subsection{The data set}
+
+A full description of how the radial spatial genetic data were simulated is available in the publication associated with this package \citep{galpern_2014}.  Briefly, we simulated the moving and mating of 1000 individuals over 300 non-overlapping generations.  Movement across the arms of the radial structure (Figure~\ref{fig:figure1}) was less likely than within the three regions of the landscape, due to landscape resistance to movement imposed on the simulated individuals.  This makes the radial structure into a semi-permeable barrier, reducing dispersal and therefore gene flow.  Given a sufficient number of generations for genetic drift under reduced gene flow, we expect a spatial genetic pattern that reflects the landscape resistance pattern in Figure~\ref{fig:figure1}.\\
+
+The data set provided with the package (\verb!radial.csv! installed in the \verb!extdata! folder) represents a spatially stratified sampling of 200 individuals at generation 300 of this simulation.  It includes 200 rows, one for each individual, two columns giving coordinates at which the individual was "sampled", and 30 paired columns giving the alleles at 15 codominant loci.  
+
+\begin{figure}[p]
+\begin{center}
+
+<<fig=TRUE, echo=FALSE, print=FALSE, results=hide>>=
+library(raster)
+radialRas <- raster(system.file("extdata/radial.asc", package="memgene"))
+plot(radialRas, legend=FALSE)
+@
+
+\caption{The radial resistance surface used to generate the spatial genetic data set used in this tutorial}
+\label{fig:figure1}
+\end{center}
+\end{figure}
+
+\subsection{MEMGENE analysis}
+
+\begin{description}
+
+\item[Step 1] Produce a genetic distance matrix
+\addcontentsline{toc}{subsection}{Step 1: Produce a genetic distance matrix}  
+
+MEMGENE requires a genetic distance matrix giving the pairwise genetic distances among individual genotypes.  Any genetic distance metric can be used.  In principle the method will also work with a population genetic distance matrix (e.g. pairwise Fst).\\
+
+In this first step we find the genetic distance matrix using the proportion of shared alleles among individuals \citep{bowcock_1994} as the metric.  We use a convenience function included in the package to produce this that wraps functions in the \verb!adegenet! package \citep{jombart_2008}.
+
+<<echo=TRUE,print=FALSE>>=
+## Load the radial genetic data
+radialData <- read.csv(system.file("extdata/radial.csv", package="memgene"))
+@
+<<echo=TRUE,print=FALSE>>=
+## Create objects for positional information and genotypes
+radialXY <- radialData[ ,1:2]
+radialGen <- radialData[, 3:ncol(radialData)]
+@
+<<echo=TRUE,print=FALSE>>=
+## Produce a proportion of shared alleles genetic distance matrix
+## using the convenience wrapper function provided with the package
+radialDM <- codomToPropShared(radialGen)
+@
+
+\item[Step 2] Extract MEMGENE variables
+\addcontentsline{toc}{subsection}{Step 2: Extract MEMGENE variables}  
+
+In this second step we extract the MEMGENE variables, using the typical interface  to the MEMGENE package (the \verb!mgQuick! function).  The analysis framework is discussed in detail in the publication associated with this package.\\
+
+The \verb!mgQuick! function does the following:  (1) Finds the Moran's eigenvectors given the sampling locations of the individuals (\verb!mgMEM! function);  (2) Uses these eigenvectors to identify significant spatial genetic patterns (\verb!mgForward! and \verb!mgRDA! functions);  (3) Returns MEMGENE variables that describe these significant patterns on a reduced set of axes (\verb!mgRDA! function).  For additional detail on these functions, and for more control over the MEMGENE analysis see the R help files.
+
+<<echo=TRUE,print=FALSE>>=
+## Run the MEMGENE analysis
+## May take several minutes
+if (!exists("radialAnalysis")) radialAnalysis <- mgQuick(radialDM, radialXY)
+@
+
+\item[Step 3] Visualize MEMGENE variables
+\addcontentsline{toc}{subsection}{Step 3: Visualize MEMGENE variables}  
+
+The MEMGENE variables represent orthonormal patterns of significant spatial genetic variation, and are ordered in terms of the amount of variation they explain from most to least.  Typically, much of the variation is summarized in the first two variables, so it can often be convenient to visualize these two initially.
+
+
+<<echo=TRUE,print=FALSE,results=hide>>=
+## Visualize the first two MEMGENE variables
+## by providing only the first two columns of the $memgene matrix
+mgMap(radialXY, radialAnalysis$memgene[, 1:2])
+@
+
+However, it is often more interesting to visualize the MEMGENE variables superimposed over some map or other.  In Figure~\ref{fig:figure2}  we superimpose the first MEMGENE variable (MEMGENE1) over the resistance surface used to create the spatial genetic data.  This can be done using the \verb!add.plot=TRUE! parameter.
+
+\begin{figure}[p]
+\begin{center}
+
+<<echo=TRUE,print=FALSE,results=hide>>=
+library(raster)
+radialRas <- raster(system.file("extdata/radial.asc", package="memgene"))
+plot(radialRas, legend=FALSE)
+mgMap(radialXY, radialAnalysis$memgene[, 1], add.plot=TRUE, legend=TRUE)
+@
+
+<<fig=TRUE, echo=FALSE, print=FALSE, results=hide>>=
+library(raster)
+radialRas <- raster(system.file("extdata/radial.asc", package="memgene"))
+plot(radialRas, legend=FALSE)
+mgMap(radialXY, radialAnalysis$memgene[, 1], add.plot=TRUE, legend=TRUE)
+@
+
+\caption{The scores of individuals on the MEMGENE1 axis superimposed on the resistance surface used to create the spatial genetic data.  Circles of similar size and colour represent individuals with similar scores on this axis.  Note how the pattern of spatial genetic variation in MEMGENE1 (spatial genetic neighbourhoods) reflects the structure of the landscape used to create it.}
+\label{fig:figure2}
+\end{center}
+\end{figure}
+
+Although visualization may often be an end in itself, the MEMGENE variables can also be used singly or in combination to test hypotheses about the creation of the spatial genetic neighbourhoods they describe.
+
+\end{description}
+
+\section{Tutorial 2:  Wildlife data set}
+
+This tutorial demonstrates the use of MEMGENE with a data set for boreal woodland caribou, a North American ungulate.
+
+\subsection{The data set}
+
+A full description of how these spatial genetic data were collected and genotyped can be found in the publication associated with this package \citep{galpern_2014}.  Briefly, these are genotypes for 87 caribou sampled on both sides of the Mackenzie River (Northwest Territories, Canada).  The Mackenzie is a major North American river that varies betwee 1 and 4.5 km through the study area.  Caribou have occasionally been reported crossing the river.\\
+
+Boreal woodland caribou are a threatened species under Canada's Species at Risk Act.  For this reason the caribou data included with the package have obfuscated sampling locations produced by reprojecting them in a way that maintains the Euclidean distance matrix among the points, but is not easily assignable to a precise location on the Earth's surface.
+
+\subsection{MEMGENE analysis}
+
+\begin{description}
+
+\item[Step 1] Produce a genetic distance matrix
+\addcontentsline{toc}{subsection}{Step 1: Produce a genetic distance matrix}  
+
+<<echo=TRUE,print=FALSE>>=
+## Load the caribou genetic data
+caribouData <- read.csv(system.file("extdata/caribou.csv", package="memgene"))
+@
+<<echo=TRUE,print=FALSE>>=
+## Create objects for positional information and genotypes
+caribouXY <- caribouData[ ,1:2]
+caribouGen <- caribouData[, 3:ncol(caribouData)]
+@
+<<echo=TRUE,print=FALSE>>=
+## Produce a proportion of shared alleles genetic distance matrix
+## using the convenience wrapper function provided with the package
+caribouDM <- codomToPropShared(caribouGen)
+@
+
+\item[Step 2] Extract MEMGENE variables
+\addcontentsline{toc}{subsection}{Step 2: Extract MEMGENE variables}  
+
+<<echo=TRUE,print=FALSE>>=
+## Run the MEMGENE analysis
+## May take several minutes
+if (!exists("caribouAnalysis")) caribouAnalysis <- mgQuick(caribouDM, caribouXY)
+@
+
+\item[Step 3] Visualize MEMGENE variables
+\addcontentsline{toc}{subsection}{Step 3: Visualize MEMGENE variables}  
+
+The results of the visualization of MEMGENE1 is shown in Figure~\ref{fig:figure3}.  This figure also appears in the publication associated with this package, sumperimposed over a map of the region.
+
+\begin{figure}[p]
+\begin{center}
+
+
+<<fig=TRUE, echo=TRUE, print=FALSE, results=hide>>=
+plot(caribouXY, type="n", xlab="", ylab="", axes=FALSE)
+mgMap(caribouXY, caribouAnalysis$memgene[, 1], add.plot=TRUE, legend=TRUE)
+box()
+@
+
+\caption{The scores of individual caribou on the MEMGENE1 axis.  The Mackenzie River separates the white and black circles diagonally through the lower half of the map (not shown).  For the full presentation of these results see the publication associated with this package.}
+\label{fig:figure3}
+\end{center}
+\end{figure}
+
+\item[Step 4] Additional interpretation
+\addcontentsline{toc}{subsection}{Step 4: Additional interpretation}
+
+Finding the adjusted R-squared (i.e. the genetic variation explained by spatial pattern) is just a matter of referencing the list element in the \verb!caribouAnalysis! object as follows:
+
+<<echo=TRUE,print=TRUE>>=
+caribouAnalysis$RsqAdj
+@
+
+Note that this low value should be interpreted not as an inadequacy of the regression to explain variation, but rather that there is only a small proportion of all genetic variation that can be attributed to spatial patterns; or more specifically, to the \verb!N-1! (where \verb!N! is the number of sampling locations) MEM spatial eigenfunctions that were extracted.  It is important to note, however, that adjustments to how the MEM eigenfunctions are extracted have the potential to subtly change which spatial patterns are captured, as well as increase R squared.  Further work is required to explore the effects of these modelling decisions.
+
+Then determining the proportion of the this variation that is explained by each of the MEMGENE variables is also straightforward:
+
+<<echo=TRUE,print=FALSE>>=
+## Find the proportional variation explained by each MEMGENE variable
+caribouMEMGENEProp <- caribouAnalysis$sdev/sum(caribouAnalysis$sdev)
+@
+
+<<echo=TRUE,print=TRUE>>=
+## Neatly print proportions for the first three MEMGENE variables
+format(signif(caribouMEMGENEProp, 3)[1:3], scientific=FALSE)
+@
+
+It is clear that there are only two distinctive patterns in these data, and the dominant pattern is that created by the Mackenzie River (i.e. MEMGENE1)
+
+\end{description}
+\begin{thebibliography}{99}
+\bibitem[Bowcock et al.(1994)]{bowcock_1994}Bowcock AM, Ruizlinares A, Tomfohrde J, et al. (1994) High resolution of human evolutionary trees with polymorphic microsatellites. \emph{Nature}, 368, 455-457.
+\bibitem[Galpern et al.(2014)]{galpern_2014}Galpern, P., Peres-Neto, P., Polfus, J., and Manseau, M. (2014) MEMGENE: Spatial pattern detection in genetic distance data. \emph{Submitted}.
+\bibitem[Jombart(2008)]{jombart_2008}Jombart T. (2008) adegenet: a R package for the multivariate analysis of genetic markers \emph{Bioinformatics} 24: 1403-1405.
+
+
+\end{thebibliography}
+\end{document}
+
+
+
+

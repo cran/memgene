@@ -1,0 +1,2 @@
+importFrom("ade4", scatterutil.base)
+exportPattern("^[[:alpha:]]+")
