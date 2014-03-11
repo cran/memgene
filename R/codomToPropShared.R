@@ -1,4 +1,4 @@
-codomToPropShared <- function(alleles, missingData = c(-98,-99)) {
+codomToPropShared <- function(alleles, missingData = c(-98,-99), genind=FALSE) {
     
     if (!require(adegenet)) stop("memgene:  Please install the adegenet package to find the proportion of shared alleles", call.=FALSE)
     
@@ -24,6 +24,11 @@ codomToPropShared <- function(alleles, missingData = c(-98,-99)) {
     genindObj <- df2genind(toGenind, sep="_", pop=NULL)
     
     ## Find proportion of shared alleles
-    return(1-propShared(genindObj))
+    if (genind) {
+        return(genindObj)
+    }
+    else {
+        return(1-propShared(genindObj))
+    }
     
 }

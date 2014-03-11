@@ -4,7 +4,7 @@
 Extraction of MEM eigenvectors given distances among sampling locations
 }
 \description{
-Extract Moran's eigenvectors given a distance matrix
+Extract MEM eigenvectors given a distance matrix
 among sampling locations of genetic material.  This matrix could be Euclidean
 or otherwise.  If truncation and/or transformation parameters
 are provided these operations occur. Truncation implies that distances
@@ -20,7 +20,7 @@ mgMEM(locD, truncation = NULL, transformation = NULL)
   \item{locD}{
   
 A symmetric distance matrix giving the distances (typically Euclidean)
-among the sampling locations of genetic material (i.e. of genotyped individuals).
+among the sampling locations of genetic material (e.g. of genotyped individuals or populations).
 
 
 }
@@ -42,7 +42,7 @@ geodesic distances using the \code{longlat=TRUE} parameter when provided with sa
 
 1.  Can be numeric from 0 to 1 specifying the
 proportion of the maximum distance in locD to truncate
-following this a minimum spanning tree is used to further
+following this a  spanning tree is used to further
 truncate as in PCNM (aka dbMEM or classical MEM) \cr
 
 2.  Can be NULL (default) indicating only the minimum spanning tree (MST) truncation where
@@ -54,8 +54,8 @@ negative eigenvectors
 }
 \value{
 A list\cr
-\code{$valuesMEM} gives the eigenvalues all Moran's eigenvectors\cr
-\code{$vectorsMEM} gives the Moran's eigenvectors in columns
+\code{$valuesMEM} gives the eigenvalues all MEM eigenvectors\cr
+\code{$vectorsMEM} gives the MEM eigenvectors in columns
 }
 \references{
 Legendre, P., and Legendre L.  2012. Numerical Ecology, 3rd. ed.  Elsevier, Amsterdam.
@@ -71,7 +71,7 @@ Paul Galpern (pgalpern@ucalgary.ca)
 radialData <- read.csv(system.file("extdata/radial.csv", package="memgene"))
 radialXY <- radialData[, 1:2]
 
-## Find Moran's eigenvectors given sampling locations
+## Find MEM eigenvectors given sampling locations
 ## by first finding the Euclidean distance matrix
 radialEuclid <- dist(radialXY)
 radialMEM <- mgMEM(radialEuclid)

@@ -13,7 +13,7 @@ containing codominant alelles, where individual genotypes are in rows, find the 
  Note that any type of genetic distance matrix can be used in MEMGENE, and the proportion of shared alleles metric is not a requirement. 
 }
 \usage{
-codomToPropShared(alleles, missingData = c(-98,-99))
+codomToPropShared(alleles, missingData = c(-98,-99), genind=FALSE)
 }
 \arguments{
   \item{alleles}{
@@ -23,6 +23,9 @@ A matrix with two adjacent columns for each locus containing codominant alleles
   \item{missingData}{
  A vector of any length giving the values in the alleles matrix representing missing data (\code{NA} also represents missing)
 }
+ \item{genind}{
+ Return a genind object rather than the proportion of shared alleles genetic distance matrix.  A genind object can be used by various functions in the adegenet package.
+ }
 }
 \details{
 First prepares the alleles matrix into a format that can be converted using functions in the adegenet package to the \code{genind} format.  \code{propShared} is then run on this object.

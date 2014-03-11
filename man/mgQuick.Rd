@@ -8,15 +8,17 @@ Memgene analysis of genetic distance data (main interface for package)
  analysis of genetic distance data.  Gracefully handles
  potential errors.  Steps are as follows:
 
- 1.   Find Moran's eigenvectors given 
+ 1.   Find MEM eigenvectors given 
       coordinates (\code{coords})\cr
 
  2.   Perform separate forward selections of positive and
-      negative Moran's eigenvectors against genetic distance (\code{genD}),
+      negative MEM eigenvectors against genetic distance (\code{genD}),
       to identify a significant
       subset, using parameters \code{forwardPerm} as the number of
       permutations and \code{forwardAlpha} as the alpha level
-      for a significant eigenvector.\cr
+      for a significant eigenvector.  NOTE: The number of permutations
+      \code{forwardPerm} is set at 100 by default to reduce analysis time for
+      exploratory analyses.  This number should be increased for final analyses.\cr
 
  3.   Find the fit of the selected eigenvectors to the
       genetic distance data (using RDA).\cr
@@ -41,7 +43,7 @@ mgQuick(genD, coords, longlat = FALSE, truncation = NULL,
 \arguments{
   \item{genD}{
 A symmetrical distance matrix giving the genetic distances among
-individual genotypes
+individual genotypes or populations
 }
   \item{coords}{
 A two column \code{matrix} or \code{data.frame} of x and y coordinates of sampling locations of individual genotypes
@@ -57,7 +59,7 @@ find the geodesic distances among sampling locations using the \code{geosphere} 
 \code{NULL} under typical usage.  See \code{\link{mgMEM}} for experimental options.  
 }
   \item{forwardPerm}{
-The number of permutations in the randomization test for the forward selection of Moran's eigenvectors
+The number of permutations in the randomization test for the forward selection of MEM eigenvectors. The default \code{forwardPerm=100} is sufficient for exploratory purposes, however this should be increased for final analyses.
 }
   \item{forwardAlpha}{
 The 1-alpha level for the forward selection process

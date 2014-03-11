@@ -1,2 +1,5 @@
 importFrom("ade4", scatterutil.base)
+import("raster")
+importFrom("gdistance", transition, costDistance)
+importFrom("vegan", spantree)
 exportPattern("^[[:alpha:]]+")
