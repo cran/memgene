@@ -1,5 +1,5 @@
-8cc9f9e6bf6f34e0da8b691d86011e41 *DESCRIPTION
-ea6037f97462b67fee88d369f14d3cf8 *NAMESPACE
+60f9f1ba163dfd66c32c7fff37f72cf9 *DESCRIPTION
+972cb990dd4636e1dca9573da57c0191 *NAMESPACE
 f3ef6cb84182c53447d8f804c576de1f *R/codomToPropShared.R
 fcc17eb95518224fbbb735f55cde0b7c *R/mgForward.R
 822e0f1f9cb57039e8c546359cf1c3fd *R/mgLandscape.R
@@ -9,10 +9,10 @@ dc27b3bafb553018ebee93b188c2f900 *R/mgQuick.R
 ef9fd139064c0e6d2222d1dba4a820f5 *R/mgRDA.R
 d5c2b3b87f904e36cfdd0e3167c8a38a *R/mgVarPart.R
 0ac79d83d8e7c7daf6483e04be21cd92 *R/print.mgLandscape.R
-dcfeb5bd3f6c501e1bbc78c732ced596 *build/vignette.rds
+8878c9f9ba384e2bee435825e355139a *build/vignette.rds
 255a64d6d7958b84ce3feff7aaee01aa *inst/doc/memgeneTutorial.R
 c177ba09ea5f7e054bcb3e8a9298b92f *inst/doc/memgeneTutorial.Rnw
-17a0a833d4be5969e0d01b73e4a5edaa *inst/doc/memgeneTutorial.pdf
+8220519da9dbe09af8311d10ac9621a0 *inst/doc/memgeneTutorial.pdf
 95b11f9f21befdce3d7dc001346ec0a9 *inst/extdata/caribou.csv
 f0060409232cf9158835a9f55dcf8c41 *inst/extdata/fragmented.asc
 1ad15f5f670bf51bb4e9ba300aef7dfc *inst/extdata/fragmented.csv

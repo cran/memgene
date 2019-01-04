@@ -3,3 +3,10 @@ import("raster")
 importFrom("gdistance", transition, costDistance)
 importFrom("vegan", spantree)
 exportPattern("^[[:alpha:]]+")
+
+importFrom("grDevices", "dev.new", "gray")
+importFrom("graphics", "box", "par", "points", "rect", "segments",
+           "strheight", "strwidth", "symbols")
+importFrom("stats", "as.dist", "dist", "na.omit", "princomp")
+
+S3method("print", "mgLandscape")
