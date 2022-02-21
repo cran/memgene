@@ -7,6 +7,7 @@ exportPattern("^[[:alpha:]]+")
 importFrom("grDevices", "dev.new", "gray")
 importFrom("graphics", "box", "par", "points", "rect", "segments",
            "strheight", "strwidth", "symbols")
+importFrom("sp", "SpatialPoints")
 importFrom("stats", "as.dist", "dist", "na.omit", "princomp")
 
 S3method("print", "mgLandscape")
